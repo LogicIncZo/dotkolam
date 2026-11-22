@@ -1,11 +1,11 @@
 /**
- * dotkolam — public library entry point.
+ * @logicinczo/dotkolam — public library entry point.
  *
  * Re-exports the whole reference implementation as one browser-safe barrel
  * (no `cli.ts`, no Node built-ins), so a single import serves library
  * consumers such as OpenKolam (https://github.com/LogicIncZo/OpenKolam):
  *
- *   import { buildGrid, buildGates, traceCurves, renderSVG } from 'dotkolam';
+ *   import { buildGrid, buildGates, traceCurves, renderSVG } from '@logicinczo/dotkolam';
  *
  * The `kolam` CLI is shipped separately via the package `bin` entry.
  */

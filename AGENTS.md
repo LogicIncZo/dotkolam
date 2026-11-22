@@ -1,6 +1,6 @@
 # AGENTS.md — working guide for AI coding agents
 
-dotKolam (npm: `dotkolam`): a JSON specification for rule-bound **sikku
+dotKolam (GitHub Packages: `@logicinczo/dotkolam`): a JSON specification for rule-bound **sikku
 kolam** (mirror-curve model: one bit per interior gate), with a
 zero-dependency TypeScript reference implementation (validator, deterministic
 generator, SVG renderer, CLI) and a formal-verification ladder (exhaustive
@@ -41,6 +41,8 @@ bound: `docs/verification.md`.
 6. **Public barrel stays browser-safe.** `src/index.ts` is the npm package's
    single export; it re-exports core/gen/prompt/render and must never pull in
    `cli.ts` or Node built-ins — OpenKolam bundles it for the browser.
+   Releases publish from CI (`.github/workflows/publish.yml`, tag `v*` or
+   manual dispatch) to GitHub Packages.
 
 ## Commands
 

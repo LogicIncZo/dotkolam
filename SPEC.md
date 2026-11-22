@@ -264,8 +264,8 @@ belong in namespaced extensions.
 - `render/` — SVG (lattice and smooth geometry, per-curve lengths for
   stroke-dashoffset drawing animation);
 - `prompt/` — deterministic prompt parser;
-- `index.ts` — public library barrel (the published `dotkolam` npm package;
-  the OpenKolam canvas app consumes it);
+- `index.ts` — public library barrel (the published `@logicinczo/dotkolam`
+  package; the OpenKolam canvas app consumes it);
 - `src/cli.ts` — `kolam generate | render | validate | info`.
 
 ## 5. References

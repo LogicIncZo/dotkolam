@@ -3,7 +3,7 @@
 Reference for the TypeScript implementation (`src/`). Zero runtime
 dependencies; everything runs in Node ≥ 18 and modern browsers. Import from
 the entry points below, the compiled `dist/` after `npm run build`, or — as
-an npm consumer — the single barrel `import … from 'dotkolam'` (package
+an npm consumer — the single barrel `import … from '@logicinczo/dotkolam'` (package
 entry `src/index.ts`, which re-exports everything documented here except the
 CLI).
 

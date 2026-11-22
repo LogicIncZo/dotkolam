@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/LogicIncZo/dotkolam/actions/workflows/ci.yml/badge.svg)](https://github.com/LogicIncZo/dotkolam/actions/workflows/ci.yml)
 [![Docs on GitHub Pages](https://img.shields.io/badge/docs-github%20pages-e8b04b)](https://logicinczo.github.io/dotkolam/docs/)
-[![npm: dotkolam](https://img.shields.io/badge/npm-dotkolam-7ec8a9)](https://www.npmjs.com/package/dotkolam)
+[![GitHub Packages](https://img.shields.io/badge/package-%40logicinczo%2Fdotkolam-7ec8a9)](https://github.com/LogicIncZo/dotkolam/pkgs/npm/%40logicinczo%2Fdotkolam)
 [![License: MIT](https://img.shields.io/badge/code-MIT-7ec8a9)](LICENSE) [![Spec: CC-BY-4.0](https://img.shields.io/badge/docs-CC--BY--4.0-b9a88f)](LICENSE)
 
 **Live**: [docs & specification](https://logicinczo.github.io/dotkolam/docs/) ·
@@ -14,9 +14,9 @@ the first of its kind — for **rule-bound sikku kolam** (Tamil
 knotted lines woven around a grid of dots (*pulli*). Alongside the spec:
 
 - **Reference implementation** (TypeScript, zero runtime deps): validator,
-  deterministic generator, SVG renderer with drawing animation — installable
-  as the [`dotkolam`](https://www.npmjs.com/package/dotkolam) npm package;
-- **`kolam` CLI** (`npm install -g dotkolam` or `npx kolam`);
+  deterministic generator, SVG renderer with drawing animation — published to
+  GitHub Packages as [`@logicinczo/dotkolam`](https://github.com/LogicIncZo/dotkolam/pkgs/npm/%40logicinczo%2Fdotkolam);
+- **`kolam` CLI** (shipped with the package);
 - **Formal verification**: exhaustive model checking, Z3 symbolic proofs,
   and an independent-model differential bridge
   ([docs/verification.md](docs/verification.md)).
@@ -35,24 +35,36 @@ construction. One bit per gate also means a kolam is a number: the optional
 
 ## Quick start
 
+The package lives on **GitHub Packages** (npm registry), which requires
+GitHub authentication for install even though it is public. One-time setup
+(see [GitHub docs](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry)):
+
 ```bash
-npm install dotkolam     # library + kolam CLI
+# ~/.npmrc  (or generate a PAT with read:packages and paste it)
+echo "@logicinczo:registry=https://npm.pkg.github.com" >> ~/.npmrc
+echo "//npm.pkg.github.com/:_authToken=$(gh auth token)" >> ~/.npmrc
+```
+
+Then:
+
+```bash
+npm install @logicinczo/dotkolam     # library + kolam CLI
 npx kolam --help
 ```
 
 Library:
 
 ```ts
-import { buildGrid, buildGates, traceCurves, renderSVG } from 'dotkolam';
+import { buildGrid, buildGates, traceCurves, renderSVG } from '@logicinczo/dotkolam';
 ```
 
 CLI:
 
 ```bash
-npx kolam generate --grid diamond:9 --symmetry C4 --strokes one --seed pongal --out k.kolam.json --render k.svg
-npx kolam validate k.kolam.json
-npx kolam info k.kolam.json
-npx kolam prompt "15 pulli dense sikku kolam, 4-fold, seed margazhi" --render k.svg
+npx @logicinczo/dotkolam generate --grid diamond:9 --symmetry C4 --strokes one --seed pongal --out k.kolam.json --render k.svg
+npx @logicinczo/dotkolam validate k.kolam.json
+npx @logicinczo/dotkolam info k.kolam.json
+npx @logicinczo/dotkolam prompt "15 pulli dense sikku kolam, 4-fold, seed margazhi" --render k.svg
 ```
 
 Developing in this repo:
