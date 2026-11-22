@@ -1,0 +1,8 @@
+node_modules/
+dist/
+app/bundle.js
+site/
+smoke/
+formal/z3/data/
+*.log
+.DS_Store

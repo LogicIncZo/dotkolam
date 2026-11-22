@@ -1,0 +1,266 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kolam-json.org/schema/kolam-1.0.schema.json",
+  "title": "Kolam-JSON 1.0",
+  "description": "A rule-bound sikku (kambi/chikku) kolam: dot grid + binary gate pattern + resolved closed curves. See SPEC.md.",
+  "type": "object",
+  "required": ["kolamVersion", "grid"],
+  "properties": {
+    "kolamVersion": { "const": "1.0" },
+    "meta": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "nameTa": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "notes": { "type": "string" },
+        "source": { "type": "string" },
+        "license": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "grid": {
+      "type": "object",
+      "required": ["spec"],
+      "properties": {
+        "spacing": { "type": "number", "exclusiveMinimum": 0 },
+        "spec": { "$ref": "#/$defs/gridSpec" }
+      },
+      "additionalProperties": true
+    },
+    "pattern": {
+      "type": "object",
+      "required": ["gates"],
+      "properties": {
+        "gates": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/gate" }
+        },
+        "index": { "type": "string", "pattern": "^[0-9]+$" },
+        "symmetry": { "$ref": "#/$defs/symmetry" }
+      },
+      "additionalProperties": true
+    },
+    "curves": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/curve" }
+    },
+    "drawingOrder": {
+      "type": "object",
+      "required": ["start", "direction", "sequence"],
+      "properties": {
+        "start": { "$ref": "#/$defs/point" },
+        "direction": { "enum": ["cw", "ccw"] },
+        "sequence": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    },
+    "analysis": {
+      "type": "object",
+      "required": ["dotCount", "gateCount", "loopCount", "isOneStroke", "totalSegments", "primitiveCounts"],
+      "properties": {
+        "dotCount": { "type": "integer", "minimum": 1 },
+        "gateCount": { "type": "integer", "minimum": 0 },
+        "loopCount": { "type": "integer", "minimum": 1 },
+        "isOneStroke": { "type": "boolean" },
+        "totalSegments": { "type": "integer", "minimum": 1 },
+        "primitiveCounts": {
+          "type": "object",
+          "required": ["circle", "drop", "door", "eye", "fan", "diamond"],
+          "properties": {
+            "circle": { "type": "integer", "minimum": 0 },
+            "drop": { "type": "integer", "minimum": 0 },
+            "door": { "type": "integer", "minimum": 0 },
+            "eye": { "type": "integer", "minimum": 0 },
+            "fan": { "type": "integer", "minimum": 0 },
+            "diamond": { "type": "integer", "minimum": 0 }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": true
+    },
+    "render": {
+      "type": "object",
+      "properties": {
+        "stroke": {
+          "type": "object",
+          "properties": {
+            "width": { "type": "number", "exclusiveMinimum": 0 },
+            "color": { "type": "string" }
+          },
+          "additionalProperties": true
+        },
+        "background": { "type": "string" },
+        "showDots": { "type": "boolean" },
+        "padding": { "type": "number", "minimum": 0 }
+      },
+      "additionalProperties": true
+    },
+    "components": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/component" }
+    },
+    "uses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["component", "transform"],
+        "properties": {
+          "component": { "type": "string" },
+          "transform": {
+            "type": "object",
+            "properties": {
+              "translate": { "$ref": "#/$defs/point" },
+              "rotate90": { "type": "integer", "minimum": 0, "maximum": 3 },
+              "reflect": { "enum": ["x", "y", "diag", "anti"] }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "point": {
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "gridSpec": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["kind", "size"],
+          "properties": {
+            "kind": { "const": "square" },
+            "size": { "type": "integer", "minimum": 1 }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["kind", "cols", "rows"],
+          "properties": {
+            "kind": { "const": "rectangle" },
+            "cols": { "type": "integer", "minimum": 1 },
+            "rows": { "type": "integer", "minimum": 1 }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["kind", "rows"],
+          "properties": {
+            "kind": { "const": "diamond" },
+            "rows": { "type": "integer", "minimum": 1 }
+          },
+          "additionalProperties": false,
+          "$comment": "rows = odd max row count; layout 1-3-...-rows-...-3-1"
+        },
+        {
+          "type": "object",
+          "required": ["kind", "widths"],
+          "properties": {
+            "kind": { "const": "rows" },
+            "widths": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "type": "integer", "minimum": 1 }
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["kind", "dots"],
+          "properties": {
+            "kind": { "const": "custom" },
+            "dots": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "array",
+                "items": { "type": "integer" },
+                "minItems": 2,
+                "maxItems": 2
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "gate": {
+      "type": "object",
+      "required": ["a", "b", "state"],
+      "properties": {
+        "a": { "$ref": "#/$defs/point" },
+        "b": { "$ref": "#/$defs/point" },
+        "state": { "enum": ["open", "closed"] }
+      },
+      "additionalProperties": false
+    },
+    "symmetry": {
+      "type": "object",
+      "required": ["group"],
+      "properties": {
+        "group": { "enum": ["none", "D1", "D2", "C4", "D4"] }
+      },
+      "additionalProperties": true
+    },
+    "stroke": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["kind", "from", "to"],
+          "properties": {
+            "kind": { "const": "line" },
+            "from": { "$ref": "#/$defs/point" },
+            "to": { "$ref": "#/$defs/point" }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["kind", "center", "r", "a0", "a1", "sweep"],
+          "properties": {
+            "kind": { "const": "arc" },
+            "center": { "$ref": "#/$defs/point" },
+            "r": { "const": 0.5 },
+            "a0": { "type": "number" },
+            "a1": { "type": "number" },
+            "sweep": { "enum": ["cw", "ccw"] }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "curve": {
+      "type": "object",
+      "required": ["id", "closed", "strokes"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "closed": { "const": true },
+        "strokes": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/stroke" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "component": {
+      "type": "object",
+      "required": ["grid", "pattern"],
+      "properties": {
+        "grid": { "type": "object", "required": ["spec"], "properties": { "spec": { "$ref": "#/$defs/gridSpec" } } },
+        "pattern": { "type": "object", "required": ["gates"], "properties": { "gates": { "type": "array", "items": { "$ref": "#/$defs/gate" } } } }
+      },
+      "additionalProperties": true
+    }
+  }
+}

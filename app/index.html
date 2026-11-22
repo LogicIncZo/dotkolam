@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kolam Harness — infinite canvas for sikku kolam</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <div id="brand"><span class="dot"></span> Kolam Harness</div>
+    <form id="promptForm">
+      <input id="prompt" type="text" autocomplete="off" spellcheck="false"
+             placeholder='Idea → Prompt → Draw  ·  e.g. "15 pulli diamond sikku kolam, 4-fold, dense, seed pongal"' />
+      <button type="submit" id="drawBtn" title="Generate and place on the canvas (Enter)">Draw</button>
+    </form>
+    <div id="chips">
+      <button class="chip" data-prompt="9 pulli diamond sikku kolam one stroke">9 pulli diamond</button>
+      <button class="chip" data-prompt="square 7 kolam, 4-fold symmetry">square 7</button>
+      <button class="chip" data-prompt="rows 1-3-5-3-1 mirror, one stroke">1-3-5-3-1</button>
+      <button class="chip" data-prompt="13 pulli dense kambi style, seed margazhi">dense 13</button>
+    </div>
+  </header>
+
+  <aside id="tools">
+    <div class="tool-group">
+      <button id="modeSelect" class="tool active" title="Select / move (1)">✥</button>
+      <button id="modeGates" class="tool" title="Edit gates: click between dots (2)">⌗</button>
+    </div>
+    <div class="tool-group">
+      <button id="btnUndo" class="tool" title="Undo (Ctrl+Z)">↶</button>
+      <button id="btnRedo" class="tool" title="Redo (Ctrl+Shift+Z)">↷</button>
+    </div>
+    <div class="tool-group">
+      <button id="btnRotate" class="tool" title="Rotate 90° (R)">⟳</button>
+      <button id="btnReflect" class="tool" title="Mirror (F)">⇄</button>
+      <button id="btnDup" class="tool" title="Duplicate (D)">⧉</button>
+      <button id="btnDelete" class="tool danger" title="Delete (Del)">🗑</button>
+    </div>
+    <div class="tool-group">
+      <button id="btnReplay" class="tool" title="Replay drawing animation">▶</button>
+      <button id="btnDots" class="tool active" title="Show dots">⣿</button>
+      <button id="btnSmooth" class="tool active" title="Smooth (tangent) geometry">〜</button>
+      <button id="btnTheme" class="tool" title="Rice-flour / paper theme">◐</button>
+      <button id="btnSnap" class="tool" title="Snap to half-unit grid">⊞</button>
+    </div>
+    <div class="tool-group">
+      <button id="btnSaveScene" class="tool" title="Save scene (.harness.json)">⬇</button>
+      <button id="btnLoadScene" class="tool" title="Load scene">⬆</button>
+      <button id="btnExportScene" class="tool" title="Whole canvas → SVG">⛶</button>
+      <button id="btnImport" class="tool" title="Import Kolam-JSON">＋</button>
+      <button id="btnClear" class="tool danger" title="Clear canvas">✕</button>
+      <input id="fileInput" type="file" accept=".json" hidden />
+    </div>
+  </aside>
+
+  <main id="stage">
+    <svg id="canvas"></svg>
+    <div id="toast"></div>
+    <div id="hud">zoom <span id="zoomLabel">1.0×</span> · <span id="countLabel">0 kolams</span></div>
+  </main>
+
+  <aside id="inspector">
+    <div id="inspEmpty">Nothing selected.<br/><small>Draw from a prompt, or click a kolam.</small></div>
+    <div id="inspBody" hidden>
+      <h3 id="inspName">kolam</h3>
+      <div id="inspBadge" class="badge"></div>
+      <div class="insp-grid" id="inspFacts"></div>
+      <div id="inspPrims" class="prims"></div>
+      <div class="insp-actions">
+        <button id="btnReroll" title="Regenerate with a new seed (same params)">⟳ reroll</button>
+        <button id="btnExportJson">export JSON</button>
+        <button id="btnExportSvg">export SVG</button>
+        <button id="btnExportPng">export PNG</button>
+      </div>
+      <details>
+        <summary>Kolam-JSON</summary>
+        <pre id="inspJson"></pre>
+      </details>
+    </div>
+    <div id="promptEcho" class="prompt-echo"></div>
+  </aside>
+</div>
+<script type="module" src="./bundle.js?v=5"></script>
+</body>
+</html>

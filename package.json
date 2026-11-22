@@ -1,0 +1,23 @@
+{
+  "name": "kolam-json",
+  "version": "0.1.0",
+  "description": "Kolam-JSON: a JSON specification for rule-bound Sikku (Kambi/Chikku) Kolam, with generator, SVG renderer, CLI, and the Kolam Harness infinite-canvas app.",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node scripts/bundle-app.mjs",
+    "test": "tsx --test test/*.test.ts",
+    "verify": "npm test && node scripts/formal.mjs",
+    "serve": "node scripts/serve.mjs",
+    "kolam": "tsx src/cli.ts",
+    "docs": "node scripts/build-docs.mjs",
+    "site": "npm run build && npm run docs"
+  },
+  "devDependencies": {
+    "ajv": "^8.17.0",
+    "esbuild": "^0.24.0",
+    "marked": "^18.2.1",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}
