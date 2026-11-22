@@ -14,6 +14,7 @@
     "site": "npm run build && npm run docs"
   },
   "devDependencies": {
+    "@types/node": "^26.6.6",
     "ajv": "^8.17.0",
     "esbuild": "^0.24.0",
     "marked": "^18.2.1",
