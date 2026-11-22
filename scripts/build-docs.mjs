@@ -59,7 +59,7 @@ function shell(title, active, bodyHtml, extraHead = '') {
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>${title} — dotKolam (Kolam-JSON)</title>
-<link rel="stylesheet" href="${active ? '../style.css' : 'style.css'}"/>
+<link rel="stylesheet" href="../docs-style.css"/>
 ${extraHead}
 </head>
 <body>
