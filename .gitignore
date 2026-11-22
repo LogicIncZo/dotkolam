@@ -1,8 +1,9 @@
 node_modules/
 dist/
-app/bundle.js
 site/
 smoke/
 formal/z3/data/
+.v2c/
+.zcode/
 *.log
 .DS_Store

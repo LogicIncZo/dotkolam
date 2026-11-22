@@ -2,7 +2,10 @@
 
 Reference for the TypeScript implementation (`src/`). Zero runtime
 dependencies; everything runs in Node ≥ 18 and modern browsers. Import from
-the entry points below (or the compiled `dist/` after `npm run build`).
+the entry points below, the compiled `dist/` after `npm run build`, or — as
+an npm consumer — the single barrel `import … from 'dotkolam'` (package
+entry `src/index.ts`, which re-exports everything documented here except the
+CLI).
 
 Coordinate systems (see [SPEC.md](../SPEC.md) §1): all module APIs work in
 **internal** lattice units (dots on even integers, spacing 2, arcs radius 1);
@@ -181,7 +184,7 @@ curveLength(c: Curve): number
 strokeColor?, strokeWidth? (0.09), dotColor?, background? ('none'),
 animateClass? }`. Each curve becomes one `<path data-length="…">` — ready
 for the `stroke-dasharray`/`stroke-dashoffset` draw-in animation (Jake
-Archibald technique), used by the Harness replay button.
+Archibald technique), used by the OpenKolam replay button.
 
 ---
 
@@ -198,31 +201,8 @@ diamond), symmetry words (`4-fold`, `mirror`, `asymmetric`…), density words
 (`dense`, `open`, `density 0.7`), stroke mode (`one stroke`,
 `brahmamudi`, `multiple loops`), `seed WORD`, and motif/occasion tags
 (`thamarai`, `margazhi`, …). `interpretation` is a human-readable trace of
-every decision — shown in the Harness echo panel. Defaults: diamond 9, C4,
+every decision — shown in the OpenKolam echo panel. Defaults: diamond 9, C4,
 σ 0.55, one stroke, seed = whole prompt (deterministic).
-
----
-
-## Harness — `src/harness/`
-
-```ts
-// scene.ts — pure data, no DOM
-newScene(): Scene                        // { kolams, nextId, camera }
-bboxOfDoc(doc): bbox                     // display units, ±1 padding
-findFreeSpot(scene, w, h): { x, y }      // Chebyshev-ring spiral with margin
-flipGatesInDoc(doc, pairs): { doc, prev }
-setGatesInDoc(doc, pairs, states): doc   // used by the undo command
-sceneToJSON(scene) / sceneFromJSON(v)    // .harness.json (versioned, validating)
-
-// commands.ts — command algebra with exact inverse
-doCmd(scene, hist, cmd) / undo(scene, hist) / redo(scene, hist)
-// Cmd = add | remove | move | setTransform | rename | gates
-```
-
-Laws (property-tested, P8): `apply(apply(s, c), invert(s, c)) === s` on the
-visible projection; redo is the inverse of undo at every depth; scene JSON
-round-trips to identity. Kolam validity is invariant under every command —
-the UI cannot produce an invalid kolam.
 
 ---
 

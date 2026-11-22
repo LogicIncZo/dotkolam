@@ -1,22 +1,53 @@
 {
-  "name": "kolam-json",
+  "name": "dotkolam",
   "version": "0.1.0",
-  "description": "Kolam-JSON: a JSON specification for rule-bound Sikku (Kambi/Chikku) Kolam, with generator, SVG renderer, CLI, and the Kolam Harness infinite-canvas app.",
+  "description": "dotKolam (Kolam-JSON): a JSON specification for rule-bound Sikku (Kambi/Chikku) Kolam, with a validator, deterministic generator, SVG renderer, and CLI.",
   "type": "module",
   "license": "MIT",
+  "keywords": [
+    "kolam",
+    "sikku",
+    "kambi",
+    "chikku",
+    "kolam-json",
+    "mirror-curve",
+    "svg",
+    "generator",
+    "tamil"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LogicIncZo/dotkolam.git"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "kolam": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "schema",
+    "README.md",
+    "SPEC.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
   "scripts": {
-    "build": "tsc -p tsconfig.json && node scripts/bundle-app.mjs",
+    "build": "tsc -p tsconfig.json",
     "test": "tsx --test test/*.test.ts",
     "verify": "npm test && node scripts/formal.mjs",
-    "serve": "node scripts/serve.mjs",
     "kolam": "tsx src/cli.ts",
-    "docs": "node scripts/build-docs.mjs",
-    "site": "npm run build && npm run docs"
+    "docs": "node scripts/build-docs.mjs"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
     "ajv": "^8.17.0",
-    "esbuild": "^0.24.0",
     "marked": "^18.2.1",
     "tsx": "^4.19.0",
     "typescript": "^5.6.0"

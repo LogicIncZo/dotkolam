@@ -17,7 +17,7 @@ is reproducible: `npm test` (Tier A) and `npm run verify` (adds Z3).
 | P5 | Flip-merge: a single gate flip changes the physical loop count by at most 1 | exhaustive TS (every config × every gate) | 2×2, 1-3-1 diamond, 2×3 | ✅ |
 | P6 | Gerdes/Jablan gcd theorem: plain weave loop count = gcd(m, n); single curve iff coprime | exhaustive TS | ALL rectangles m, n ≤ 7 | ✅ |
 | P7 | Spec well-formedness: schema + semantic validator complete & consistent | mutation testing (6 mutants rejected) + ajv cross-agreement + exhaustive docs validated | diamond 1-5-1 full space + curated examples | ✅ |
-| P8 | Harness laws (undo/redo, round-trip, NaN-free camera) | node:test battery in `test/harness.test.ts` | seeded sequences + property fuzz | ✅ (see test file) |
+| P8 | Harness laws (undo/redo, round-trip, NaN-free camera) — verified in the **OpenKolam** repo (`test/harness.test.ts`), against this package as its oracle | node:test battery in OpenKolam | seeded sequences + property fuzz | ✅ (see OpenKolam) |
 | D1 | Differential: independent Python/Z3 model computes identical loop counts to the TS reference | full cross-check | ALL configs of 2×2, 1-3-1, 2×3, 1-3-3-1, 1-5-1 (66,720 configs) | ✅ |
 | L1 | Literature anchor: exactly **240 of 65,536** one-stroke patterns on the 1-5-1 diamond (Yanagisawa–Nagata 2007) | exhaustive enumeration | full space | ✅ |
 | L2 | Literature anchor: 1-3-1 plain weave = single stroke of **20 segments** (npj 2026: N_px = 2(ND²+1)) | unit test | — | ✅ |

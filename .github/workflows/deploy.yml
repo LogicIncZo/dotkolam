@@ -27,8 +27,8 @@ jobs:
 
       - run: npm ci
 
-      # site = app (infinite canvas) + rendered documentation
-      - run: npm run site
+      # docs-only site (the OpenKolam app deploys from its own repo)
+      - run: npm run docs
 
       - uses: actions/upload-pages-artifact@v3
         with:

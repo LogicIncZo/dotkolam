@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 /**
  * Build the documentation site into site/:
- *   site/index.html        → the Kolam Harness app (copied from app/)
+ *   site/index.html        → redirect to the docs (the OpenKolam app lives in
+ *                            its own repo: https://github.com/LogicIncZo/OpenKolam)
  *   site/docs/<page>.html  → rendered markdown documentation
- * Dev-only (uses marked). Zero runtime deps for the app itself.
+ * Dev-only (uses marked). Zero runtime deps for the library itself.
  */
 import { marked } from 'marked';
-import { readFileSync, writeFileSync, mkdirSync, readdirSync, statSync, copyFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, copyFileSync } from 'node:fs';
 import { join, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -57,18 +58,18 @@ function shell(title, active, bodyHtml, extraHead = '') {
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>${title} — Kolam-JSON</title>
+<title>${title} — dotKolam (Kolam-JSON)</title>
 <link rel="stylesheet" href="${active ? '../style.css' : 'style.css'}"/>
 ${extraHead}
 </head>
 <body>
 <header>
-  <div class="brand"><a href="${active ? '../' : './'}"><span class="dot"></span>Kolam-JSON</a>
-    <span class="sub">sikku kolam · spec, tools &amp; infinite canvas</span></div>
+  <div class="brand"><a href="${active ? '../' : './'}"><span class="dot"></span>dotKolam</a>
+    <span class="sub">Kolam-JSON · sikku kolam spec &amp; tools</span></div>
   <nav>${nav}</nav>
 </header>
 <main>${bodyHtml}</main>
-<footer>Kolam-JSON 1.0 · MIT (code) / CC-BY-4.0 (docs) · <a href="https://github.com/LogicIncZo/kolam-json">GitHub</a></footer>
+<footer>dotKolam · Kolam-JSON 1.0 · MIT (code) / CC-BY-4.0 (docs) · <a href="https://github.com/LogicIncZo/dotkolam">GitHub</a> · <a href="https://github.com/LogicIncZo/OpenKolam">OpenKolam app</a></footer>
 </body>
 </html>`;
 }
@@ -79,10 +80,15 @@ const pageSlug = (p) => p.slug ?? slug(p.file);
 // ---------- build ----------
 mkdirSync(join(SITE, 'docs'), { recursive: true });
 
-// copy the app to the site root (bundle must be built first)
-for (const f of ['index.html', 'style.css', 'bundle.js']) {
-  copyFileSync(join(ROOT, 'app', f), join(SITE, f));
-}
+// site root: redirect to the docs (no app here anymore)
+writeFileSync(
+  join(SITE, 'index.html'),
+  `<!doctype html><html lang="en"><head><meta charset="utf-8"/>
+<meta http-equiv="refresh" content="0; url=docs/">
+<title>Kolam-JSON — docs</title></head>
+<body>Docs moved to <a href="docs/">docs/</a>. The Kolam Harness app is now
+<a href="https://github.com/LogicIncZo/OpenKolam">OpenKolam</a>.</body></html>`,
+);
 
 // shared stylesheet
 writeFileSync(
@@ -131,4 +137,4 @@ for (const [file, name] of [
   copyFileSync(join(SITE, 'docs', `${slug(file)}.html`), join(SITE, 'docs', `${name}.html`));
 }
 
-console.log(`docs site → ${SITE} (${pages.length} pages + app)`);
+console.log(`docs site → ${SITE} (${pages.length} pages)`);

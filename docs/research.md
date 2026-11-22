@@ -125,7 +125,7 @@ prior art:
 - **evoluteur/kolam-maker, MIT (2026)** —
   <https://github.com/evoluteur/kolam-maker>: mirror-curve generator; mirrors
   added in groups of four until one line remains; click-between-dots toggle
-  UX (adopted in Kolam Harness); animated SVG; URL state sharing.
+  UX (adopted in the OpenKolam canvas app); animated SVG; URL state sharing.
 - **zen-kolam (no license), SIKKU_KOLAM_GENERATOR (MIT)** — 16 cell curve
   patterns + connectivity rules (MATLAB File Exchange lineage); the first is
   unusable for code reuse (no license), both lack any format.
