@@ -13,9 +13,9 @@
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { generate } from './gen/generator.js';
-import { renderSVG } from './render/svg.js';
+import { renderSVG, renderSysSVG } from './render/svg.js';
 import { validateDoc } from './core/validate.js';
-import { canonicalJSON } from './core/doc.js';
+import { canonicalJSON, sysFromDoc } from './core/doc.js';
 import { parsePrompt } from './prompt/parser.js';
 import { KolamDoc, GridSpec } from './core/types.js';
 import { SymGroup } from './gen/symmetry.js';
@@ -67,6 +67,7 @@ commands:
            [--strokes one|any] [--seed pongal] [--name NAME]
            [--out FILE.kolam.json] [--render FILE.svg] [--smooth]
   render   FILE.kolam.json [--out FILE.svg] [--smooth] [--width 640] [--no-dots] [--dark]
+           (--smooth: render the smooth kambi geometry re-traced from pattern.gates)
   validate FILE.kolam.json...
   info     FILE.kolam.json...
   prompt   "TEXT"  [...same flags as generate]`;
@@ -89,7 +90,10 @@ function emit(doc: KolamDoc, opts: { out?: string | undefined; render?: string |
   if (opts.out) writeFileSync(opts.out, json + '\n');
   else process.stdout.write(json + '\n');
   if (opts.render) {
-    writeFileSync(opts.render, renderSVG(doc, { width: 640, ...(opts.smooth ? {} : {}) }) + '\n');
+    const svg = opts.smooth
+      ? renderSysSVG(sysFromDoc(doc), { width: 640, mode: 'smooth' })
+      : renderSVG(doc, { width: 640 });
+    writeFileSync(opts.render, svg + '\n');
   }
 }
 
@@ -146,11 +150,15 @@ try {
       const file = rest.find((a) => !a.startsWith('--'));
       if (!file) throw new Error('render needs a file');
       const doc = loadDoc(file);
-      const svg = renderSVG(doc, {
+      if (has('smooth') && !doc.pattern) {
+        throw new Error('--smooth re-traces pattern.gates; the document has no pattern (curves-only docs render lattice only)');
+      }
+      const base = {
         width: parseInt(flag('width') ?? '640', 10),
         showDots: !has('no-dots'),
         ...(has('dark') ? { background: '#3b2a1e', strokeColor: '#f5f1e6', dotColor: '#b08d57' } : {}),
-      });
+      };
+      const svg = has('smooth') ? renderSysSVG(sysFromDoc(doc), { ...base, mode: 'smooth' }) : renderSVG(doc, base);
       const out = flag('out') ?? `${file.replace(/\.kolam\.json$/, '')}.svg`;
       writeFileSync(out, svg + '\n');
       console.log(`wrote ${out}`);
