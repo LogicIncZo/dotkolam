@@ -89,6 +89,12 @@ Run before finishing any task:
 5. Commit only what the task asks; keep generated and source changes
    separable in review (rule 2's same-commit requirement is the one pairing
    exception).
+6. **Branch model & milestone gate.** Work lands on `dev` only via PRs from
+   feature branches (`feat/…`, `fix/…`, `chore/…`), CI green before merge.
+   Never merge, push, or fast-forward `main`: `dev`→`main` is the
+   **human-reviewed milestone gate** — one release PR per milestone, merged
+   by a human, then tagged (see ROADMAP "Release process"). Automation stops
+   at the PR into `dev`.
 
 ## Conventions
 

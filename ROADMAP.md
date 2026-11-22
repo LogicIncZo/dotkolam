@@ -9,6 +9,20 @@ mode). The package version always matches its release tag.
 
 Milestones track releases on GitHub; this file is the narrative view.
 
+## Release process — the milestone gate
+
+- All work lands on `dev` through PRs from feature branches
+  (`feat/…`, `fix/…`, `chore/…`); CI must be green before a feature PR
+  merges into `dev`.
+- **`dev` → `main` is a human-reviewed milestone gate.** One release PR per
+  milestone, reviewed and merged by a human — agents and automation must
+  never merge, push, or fast-forward `main` (a branch ruleset enforces the
+  PR-only flow). The `vX.Y.Z` tag on `main` triggers the GitHub Packages
+  publish workflow.
+- A milestone is ready for human review when every issue in it is closed on
+  `dev` and full CI parity passes (`npm run build && npm run verify` +
+  the examples determinism diff).
+
 ## v0.1.0 — next
 
 - [ ] **`components`/`uses` motif composition** — the schema defines
