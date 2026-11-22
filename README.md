@@ -1,5 +1,11 @@
 # Kolam-JSON + Kolam Harness
 
+[![CI](https://github.com/LogicIncZo/kolam-json/actions/workflows/ci.yml/badge.svg)](https://github.com/LogicIncZo/kolam-json/actions/workflows/ci.yml)
+[![Docs & app on GitHub Pages](https://img.shields.io/badge/docs-github%20pages-e8b04b)](https://logicinczo.github.io/kolam-json/)
+[![License: MIT](https://img.shields.io/badge/code-MIT-7ec8a9)](LICENSE) [![Spec: CC-BY-4.0](https://img.shields.io/badge/docs-CC--BY--4.0-b9a88f)](LICENSE)
+
+**Live**: [docs & specification](https://logicinczo.github.io/kolam-json/docs/) · **[run Kolam Harness in the browser](https://logicinczo.github.io/kolam-json/)** (fully offline once loaded)
+
 **Kolam-JSON** is a research-driven JSON specification — the first of its
 kind — for **rule-bound sikku kolam** (Tamil சிக்கு/கம்பி கோலம், Telugu
 chukkala muggu): the South Indian threshold art of knotted lines woven around
