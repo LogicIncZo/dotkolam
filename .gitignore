@@ -6,6 +6,3 @@ smoke/
 formal/z3/data/
 *.log
 .DS_Store
-
-# Workflows are managed on GitHub directly (local token lacks 'workflow' scope)
-.github/
