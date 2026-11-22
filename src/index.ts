@@ -11,7 +11,7 @@
  */
 
 // Core model: types, grids, gates, trace (permutation orbits), analysis,
-// validator, doc (de)serialization.
+// validator, doc (de)serialization, coordinate conversion, hit-testing.
 export * from './core/types.js';
 export * from './core/grid.js';
 export * from './core/gates.js';
@@ -19,6 +19,8 @@ export * from './core/trace.js';
 export * from './core/analysis.js';
 export * from './core/validate.js';
 export * from './core/doc.js';
+export * from './core/coords.js';
+export * from './core/pick.js';
 
 // Generation: seeded RNG, symmetry orbits, deterministic generator.
 export * from './gen/rng.js';

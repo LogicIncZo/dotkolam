@@ -97,6 +97,7 @@ machine-checked invariant:
 ```
 AGENTS.md             working guide for AI coding agents (commands, invariants, change protocol)
 SPEC.md               the Kolam-JSON 1.0 specification
+ROADMAP.md            release roadmap (v0.0.1 baseline → milestones)
 schema/               JSON Schema 2020-12
 docs/research.md      annotated bibliography (formal models, tradition, prior art)
 docs/verification.md  verification results (what is proven, how, at what bound)
