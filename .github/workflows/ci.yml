@@ -36,7 +36,7 @@ jobs:
       - name: Build docs site
         run: npm run docs
 
-      - name: CLI smoke: generate → validate → render
+      - name: "CLI smoke — generate, validate, render"
         run: |
           npx tsx src/cli.ts generate --grid diamond:9 --symmetry C4 --seed ci --out /tmp/ci.kolam.json --render /tmp/ci.svg
           npx tsx src/cli.ts validate /tmp/ci.kolam.json
