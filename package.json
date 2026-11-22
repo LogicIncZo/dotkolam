@@ -1,6 +1,6 @@
 {
   "name": "@logicinczo/dotkolam",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "dotKolam (Kolam-JSON): a JSON specification for rule-bound Sikku (Kambi/Chikku) Kolam, with a validator, deterministic generator, SVG renderer, and CLI.",
   "type": "module",
   "license": "MIT",
