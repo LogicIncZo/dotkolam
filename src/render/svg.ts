@@ -21,9 +21,13 @@ export interface RenderOptions {
   dotColor?: string;
   background?: string;
   animateClass?: string; // css class for <path>
+  mode?: 'lattice' | 'smooth'; // renderSysSVG geometry style (default 'lattice');
+  // ignored by renderSVG, which renders doc.curves as given. 'smooth' curves
+  // are a rendering-only view (arcs of radius √2/4 display units), not
+  // Kolam-JSON-serializable — the schema fixes arc radius at 0.5.
 }
 
-const DEFAULTS: Required<Omit<RenderOptions, 'animateClass'>> = {
+const DEFAULTS: Required<Omit<RenderOptions, 'animateClass' | 'mode'>> = {
   width: 640,
   padding: 1,
   showDots: true,
@@ -71,6 +75,14 @@ export function renderSVG(doc: KolamDoc, opts: RenderOptions = {}): string {
 
 /** Render directly from a GateSystem (traces curves on the fly). */
 export function renderSysSVG(sys: GateSystem, opts: RenderOptions = {}): string {
+  if ((opts.mode ?? 'lattice') === 'smooth') {
+    // Smooth tangent geometry: re-trace in smooth mode and render those
+    // curves directly. No KolamDoc round-trip — smooth curves are not
+    // Kolam-JSON-serializable (arc radius ≠ 0.5).
+    const { curves } = traceCurves(sys, 'smooth');
+    const doc: KolamDoc = { kolamVersion: '1.0', grid: { spec: sys.grid.spec, spacing: 1 }, curves };
+    return renderSVG(doc, opts);
+  }
   const doc = docFromSys(sys, { includeCurves: true, includeAnalysis: false });
   return renderSVG(doc, opts);
 }
