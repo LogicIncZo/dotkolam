@@ -7,6 +7,9 @@
  *                  [--out file.kolam.json] [--render out.svg] [--smooth]
  *   kolam render   file.kolam.json [--out out.svg] [--smooth] [--width 640]
  *                  [--dots|--no-dots] [--dark]
+ *   kolam gcode    file.kolam.json [--out out.nc] [--scale 10] [--offset 0,0]
+ *                  [--feed 1500] [--units mm|in] [--pen-down CMD] [--pen-up CMD]
+ *                  [--settle 0.2] [--no-park] [--smooth]
  *   kolam validate file.kolam.json...
  *   kolam info     file.kolam.json...
  *   kolam prompt   "15 pulli diamond sikku kolam, 4-fold, dense" [--out ...]
@@ -14,8 +17,10 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { generate } from './gen/generator.js';
 import { renderSVG, renderSysSVG } from './render/svg.js';
+import { curvesToGcode, gcodeHeader, renderGcode, GcodeOptions } from './render/gcode.js';
 import { validateDoc } from './core/validate.js';
 import { canonicalJSON, sysFromDoc } from './core/doc.js';
+import { traceCurves } from './core/trace.js';
 import { parsePrompt } from './prompt/parser.js';
 import { KolamDoc, GridSpec } from './core/types.js';
 import { SymGroup } from './gen/symmetry.js';
@@ -68,6 +73,9 @@ commands:
            [--out FILE.kolam.json] [--render FILE.svg] [--smooth]
   render   FILE.kolam.json [--out FILE.svg] [--smooth] [--width 640] [--no-dots] [--dark]
            (--smooth: render the smooth kambi geometry re-traced from pattern.gates)
+  gcode    FILE.kolam.json [--out FILE.nc] [--scale 10] [--offset 0,0] [--feed 1500]
+           [--units mm|in] [--pen-down CMD] [--pen-up CMD] [--settle 0.2] [--no-park] [--smooth]
+           (GRBL g-code for pen plotters, curves in drawingOrder; --smooth: kambi geometry)
   validate FILE.kolam.json...
   info     FILE.kolam.json...
   prompt   "TEXT"  [...same flags as generate]`;
@@ -161,6 +169,53 @@ try {
       const svg = has('smooth') ? renderSysSVG(sysFromDoc(doc), { ...base, mode: 'smooth' }) : renderSVG(doc, base);
       const out = flag('out') ?? `${file.replace(/\.kolam\.json$/, '')}.svg`;
       writeFileSync(out, svg + '\n');
+      console.log(`wrote ${out}`);
+      break;
+    }
+    case 'gcode': {
+      // the file is the first argument that is neither a flag nor a flag's value
+      const VALUELESS = new Set(['--smooth', '--no-park']);
+      const file = rest.find(
+        (a, i) => !a.startsWith('--') && !(i > 0 && rest[i - 1]!.startsWith('--') && !VALUELESS.has(rest[i - 1]!)),
+      );
+      if (!file) throw new Error('gcode needs a file');
+      const doc = loadDoc(file);
+      const num = (name: string, fallback: number): number => {
+        const v = flag(name);
+        return v === undefined || v === '' ? fallback : Number(v);
+      };
+      const penCommand = (name: string): string | undefined => {
+        const v = flag(name);
+        if (v === '') throw new Error(`--${name} needs a command, e.g. --${name} "M3 S1000"`);
+        return v;
+      };
+      const off = flag('offset');
+      const offset: [number, number] =
+        off === undefined || off === '' ? [0, 0] : (off.split(',').map(Number) as [number, number]);
+      const penDown = penCommand('pen-down');
+      const penUp = penCommand('pen-up');
+      const opts: GcodeOptions = {
+        scale: num('scale', 10),
+        offset,
+        units: (flag('units') ?? 'mm') as 'mm' | 'in',
+        feed: num('feed', 1500),
+        ...(penDown !== undefined ? { penDown } : {}),
+        ...(penUp !== undefined ? { penUp } : {}),
+        settle: num('settle', 0.2),
+        park: !has('no-park'),
+      };
+      let g: string;
+      if (has('smooth')) {
+        if (!doc.pattern) {
+          throw new Error('--smooth re-traces pattern.gates; the document has no pattern (curves-only docs export lattice geometry only)');
+        }
+        const { curves, drawingOrder } = traceCurves(sysFromDoc(doc), 'smooth');
+        g = gcodeHeader(doc, opts) + curvesToGcode(curves, drawingOrder, opts);
+      } else {
+        g = renderGcode(doc, opts);
+      }
+      const out = flag('out') ?? `${file.replace(/\.kolam\.json$/, '')}.nc`;
+      writeFileSync(out, g);
       console.log(`wrote ${out}`);
       break;
     }

@@ -65,6 +65,7 @@ npx @logicinczo/dotkolam generate --grid diamond:9 --symmetry C4 --strokes one -
 npx @logicinczo/dotkolam validate k.kolam.json
 npx @logicinczo/dotkolam info k.kolam.json
 npx @logicinczo/dotkolam prompt "15 pulli dense sikku kolam, 4-fold, seed margazhi" --render k.svg
+npx @logicinczo/dotkolam gcode k.kolam.json --scale 12 --out k.nc    # GRBL pen-plotter export
 ```
 
 Developing in this repo:
@@ -105,7 +106,7 @@ examples/             curated .kolam.json files (all validate at L3)
 motifs/               reusable motifs (chakaram)
 src/core/             grid, gates, trace, analysis, validator, doc I/O
 src/gen/              seeded RNG, symmetry orbits, σ-density, FTS one-stroke search
-src/render/           SVG (lattice + smooth tangent geometry), animation lengths
+src/render/           SVG and G-code exporters (lattice + smooth geometry), animation lengths
 src/prompt/           deterministic Idea→Prompt→Draw parser
 src/index.ts          public library barrel (the npm package entry)
 src/cli.ts            the kolam CLI

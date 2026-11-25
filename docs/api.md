@@ -188,6 +188,49 @@ Archibald technique), used by the OpenKolam replay button.
 
 ---
 
+## G-code exporter — `src/render/gcode.ts` (draft)
+
+```ts
+renderGcode(doc: KolamDoc, opts?: GcodeOptions): string             // whole document
+curvesToGcode(curves: Curve[], sequence?: string[], opts?): string // program body only
+gcodeHeader(doc: KolamDoc | null, opts?: GcodeOptions): string     // setup block only
+```
+
+Export a kolam as GRBL g-code for pen plotters and drawing robots. The
+curves are already ordered closed strokes, so `renderGcode` transcribes
+them in `drawingOrder` order — travel to a curve's start, pen down, one
+move per stroke, pen up — and traces a document that has no `curves`
+from its pattern. Hosts that trace themselves (for instance in smooth
+geometry) pass `traceCurves(sys, 'smooth')` to `curvesToGcode`.
+
+- `line` → `G1 X.. Y..`, with the feed stated on the first drawing move
+  after each pen-down; `arc` → `G2` (clockwise) / `G3` (counter-clockwise)
+  with `I J` = centre − start, GRBL's incremental form; a full circle is
+  two semicircles.
+- Frame: the document's right-handed coordinates, +X right and +Y up
+  (unlike SVG output, nothing is mirrored), mapped onto work coordinates
+  by `scale` (work units per display unit, i.e. per pulli spacing) and
+  `offset` (the work position of the display origin).
+- `scale`, `offset`, `feed` and the numbers inside `penDown` / `penUp` are
+  all in the selected units — with `units: 'in'`, convert your Z heights
+  and feeds.
+- Pen control is machine specific: `penDown` / `penUp` are the raw
+  command lines that lower and lift the pen, each followed by a `G4`
+  dwell of `settle` seconds. The defaults suit a hobby servo on the
+  spindle-PWM pin (`M3 S1000` / `M5 S0`); a Z-lift pen would pass e.g.
+  `'G1 Z-2 F300'` / `'G1 Z5 F600'`.
+- The output is deterministic: fixed-point with 4 decimals, no signed
+  zero or exponent forms, and comment lines within GRBL's 80-character
+  line limit.
+
+`GcodeOptions`: `{ scale? (10), offset? ([0, 0]), units? ('mm' | 'in'),
+feed? (1500), penDown?, penUp?, settle? (0.2), park? (true) }`; `park`
+returns to the work origin after the last stroke. Invalid options throw
+`Error`. This is a **draft**: check the pen commands and the travel
+limits on your machine before the first real plot.
+
+---
+
 ## Prompt parser — `src/prompt/parser.ts`
 
 ```ts
@@ -215,6 +258,7 @@ kolam generate --grid diamond:9 [--symmetry C4] [--density 0.55]
 kolam prompt   "15 pulli dense sikku kolam, 4-fold, seed margazhi" […same flags]
 kolam render   f.kolam.json [--out f.svg] [--width 640] [--no-dots] [--dark]
 kolam validate f.kolam.json…          # exit 1 on any invalid file
+kolam gcode   f.kolam.json [--out f.nc] [--scale 10] [--offset 0,0] [--smooth]   # GRBL pen-plotter export
 kolam info     f.kolam.json…          # dots/gates/loops/primitives/index
 ```
 
