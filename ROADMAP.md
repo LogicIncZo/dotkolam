@@ -35,8 +35,9 @@ Milestones track releases on GitHub; this file is the narrative view.
 - [ ] **Incremental trace** — per-gate recompute (dirty-orbit set) so large
       grids edit at interactive rates for canvas hosts; the API today is
       batch/whole-model
-- [ ] **`gcode.ts` exporter (draft)** — kolam → GRBL g-code for pen
+- [x] **`gcode.ts` exporter (draft)** — kolam → GRBL g-code for pen
       plotters/robots; stroke ordering already comes from `drawingOrder`
+      (#7)
 - [ ] **docs/api.md refresh** — document `core/coords.ts` + `core/pick.ts`
       (shipped in v0.0.1) and the `RenderOptions.mode` smooth rendering
 

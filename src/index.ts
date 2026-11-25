@@ -32,3 +32,6 @@ export * from './prompt/parser.js';
 
 // SVG renderer (lattice + smooth tangent geometry).
 export * from './render/svg.js';
+
+// G-code exporter for GRBL pen plotters and drawing robots (draft).
+export * from './render/gcode.js';

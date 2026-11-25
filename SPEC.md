@@ -262,7 +262,8 @@ belong in namespaced extensions.
 - `gen/` — seeded symmetric generator with FTS one-stroke search and the
   D4→C4→D2→D1→none relaxation ladder;
 - `render/` — SVG (lattice and smooth geometry, per-curve lengths for
-  stroke-dashoffset drawing animation);
+  stroke-dashoffset drawing animation) and GRBL g-code for pen plotters
+  and drawing robots;
 - `prompt/` — deterministic prompt parser;
 - `index.ts` — public library barrel (the published `@logicinczo/dotkolam`
   package; the OpenKolam canvas app consumes it);

@@ -40,3 +40,5 @@ jobs:
         run: |
           npx tsx src/cli.ts generate --grid diamond:9 --symmetry C4 --seed ci --out /tmp/ci.kolam.json --render /tmp/ci.svg
           npx tsx src/cli.ts validate /tmp/ci.kolam.json
+          npx tsx src/cli.ts gcode /tmp/ci.kolam.json --out /tmp/ci.nc
+          npx tsx src/cli.ts gcode /tmp/ci.kolam.json --smooth --scale 12 --offset 10,10 --out /tmp/ci-smooth.nc
