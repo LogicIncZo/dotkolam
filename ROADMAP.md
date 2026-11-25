@@ -37,8 +37,9 @@ Milestones track releases on GitHub; this file is the narrative view.
       batch/whole-model
 - [ ] **`gcode.ts` exporter (draft)** — kolam → GRBL g-code for pen
       plotters/robots; stroke ordering already comes from `drawingOrder`
-- [ ] **docs/api.md refresh** — document `core/coords.ts` + `core/pick.ts`
+- [x] **docs/api.md refresh** — document `core/coords.ts` + `core/pick.ts`
       (shipped in v0.0.1) and the `RenderOptions.mode` smooth rendering
+      (#8)
 
 ## later
 

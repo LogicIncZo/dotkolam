@@ -10,7 +10,9 @@ CLI).
 Coordinate systems (see [SPEC.md](../SPEC.md) §1): all module APIs work in
 **internal** lattice units (dots on even integers, spacing 2, arcs radius 1);
 **Kolam-JSON documents** use **display** units (spacing 1, arcs radius 0.5).
-Conversion happens only at the document boundary (`internal / 2`).
+Serialization converts at the document boundary (`internal / 2`); canvas
+hosts that map pointer or view coordinates into the model frame convert
+explicitly with `core/coords.ts` (below).
 
 ---
 
@@ -88,9 +90,13 @@ orbitToCurve(sys, orbit, id, mode?): Curve
   cycles only (P1).
 - `mode: 'lattice' | 'smooth'` — lattice emits chords + arcs of radius 0.5
   hugging dots; **smooth** trims each lattice segment by the tangent length
-  √2⁄2 at turning ends and rounds every corner with the tangent circle of
-  radius √2⁄2 centered on the dot, producing the G1-continuous traditional
-  line (distance √2⁄4 from every dot; see SPEC §1.3).
+  at turning ends and rounds every corner with the tangent circle centred
+  on the dot (radius √2⁄2 internal = √2⁄4 in the display-unit strokes it
+  returns), producing the G1-continuous traditional line, everywhere
+  √2⁄4 (display) from the dots it weaves (see SPEC §1.3).
+- Smooth curves are a **rendering-only** view of the same topology: their
+  arc radius is not 0.5, so they are not valid Kolam-JSON `curves`
+  (`validateDoc` rejects them; see the renderer's `mode` option).
 - `orbitSignature(o)` identifies the forward/reverse pair of a curve.
 
 ### analysis.ts — loop counts and primitives
@@ -129,6 +135,44 @@ Checks (SPEC §2.5): closed stroke chains; arcs radius 0.5 centred on dots
 with endpoints on the circle; dot-safety ≥ √2⁄4; gate channels valid and
 complete; `pattern.index` matches gates; `curves` equals the deterministic
 trace of `pattern`; `analysis` matches recomputation.
+
+### coords.ts — internal ↔ display conversion
+
+```ts
+toDisplay(p: Pt): Pt                      // internal -> display: halve both coordinates
+fromDisplay(p: Pt): Pt                    // display -> internal: double both coordinates
+scaleDistance(d: number): number          // a tolerance or radius, display -> internal (×2)
+```
+
+Both conversions are exact dyadic halving/doubling and are mutual inverses
+on the lattice. In the display frame dots sit on integers and nodes
+(channel midpoints) on half-integers in exactly one axis. A canvas host
+maps a pointer position into the model frame with `fromDisplay` and
+converts its hit tolerances with `scaleDistance` before calling the
+hit-tests below.
+
+### pick.ts — hit-testing
+
+```ts
+channelSegment(node: Pt): [Pt, Pt]                    // the node's two flanking lattice positions
+squaredDistPointSegment(p: Pt, a: Pt, b: Pt): number  // exact on lattice inputs
+pickDot(grid: DotGrid, p: Pt, maxDist: number): Pt | null
+pickGate(sys: GateSystem, p: Pt, maxDist: number): GateHit | null
+```
+
+All inputs are internal coordinates and `maxDist` is inclusive.
+`pickDot` returns the nearest dot within `maxDist`; `pickGate` returns the
+nearest channel — interior or boundary — measured to the whole channel
+segment, not just its midpoint. `GateHit` = `{ node, a, b, interior }`:
+`node` is the channel midpoint, `a`/`b` its two flanking lattice positions
+(for a boundary channel one of them is not a dot), and `interior: true`
+means both flanks are dotted — a gate that carries one bit and may be
+edited — while `interior: false` is an always-closed boundary channel.
+Both return `null` when nothing lies within `maxDist`, and both break ties
+deterministically: `pickDot` by canonical dot order (sorted by `y`, then
+`x`), `pickGate` by the smallest node key compared as text (`"x,y"`, so
+`"10,0"` sorts before `"9,0"`) — repeated queries over the same geometry
+always pick the same feature.
 
 ---
 
@@ -182,9 +226,23 @@ curveLength(c: Curve): number
 
 `RenderOptions`: `{ width? (640), padding? (1), showDots? (true),
 strokeColor?, strokeWidth? (0.09), dotColor?, background? ('none'),
-animateClass? }`. Each curve becomes one `<path data-length="…">` — ready
-for the `stroke-dasharray`/`stroke-dashoffset` draw-in animation (Jake
-Archibald technique), used by the OpenKolam replay button.
+animateClass?, mode? ('lattice') }`. Each curve becomes one
+`<path data-length="…">` — ready for the `stroke-dasharray`/
+`stroke-dashoffset` draw-in animation (Jake Archibald technique), used by
+the OpenKolam replay button.
+
+**Smooth mode** (`mode: 'smooth'`, honoured by `renderSysSVG`): re-traces
+the gate system in smooth geometry — every 90° corner rounded by the
+tangent circle of radius √2⁄4 (display units) centred on its dot. The
+output has the same curve count and loop structure as the lattice render,
+with the traditional smooth *kambi* line in place of chords and 0.5 arcs
+(SPEC §1.3). Smooth curves are a display transform, not document data:
+`renderSVG(doc)` ignores `mode` and draws `doc.curves` exactly as written.
+To render a document smoothly, re-trace it from its pattern:
+`renderSysSVG(sysFromDoc(doc), { mode: 'smooth' })`. That needs a
+`pattern` — on a curves-only document `sysFromDoc` builds the all-closed
+system, so the call silently renders that instead of `doc.curves` (the
+CLI's `render --smooth` refuses such documents).
 
 ---
 
@@ -211,9 +269,9 @@ every decision — shown in the OpenKolam echo panel. Defaults: diamond 9, C4,
 ```
 kolam generate --grid diamond:9 [--symmetry C4] [--density 0.55]
                [--strokes one|any] [--seed pongal] [--name N]
-               [--out f.kolam.json] [--render f.svg]
+               [--out f.kolam.json] [--render f.svg] [--smooth]
 kolam prompt   "15 pulli dense sikku kolam, 4-fold, seed margazhi" […same flags]
-kolam render   f.kolam.json [--out f.svg] [--width 640] [--no-dots] [--dark]
+kolam render   f.kolam.json [--out f.svg] [--width 640] [--no-dots] [--dark] [--smooth]
 kolam validate f.kolam.json…          # exit 1 on any invalid file
 kolam info     f.kolam.json…          # dots/gates/loops/primitives/index
 ```
@@ -221,6 +279,13 @@ kolam info     f.kolam.json…          # dots/gates/loops/primitives/index
 `--grid` accepts `square:N`, `rectangle:CxR`, `diamond:N` (odd),
 `rows:1-3-5-3-1`, `custom:x,y;x,y`. Diagnostics go to stderr, JSON to stdout
 (or `--out`), so it composes in pipes.
+
+`--smooth` (with `--render`, or `render`) writes the SVG in smooth kambi
+geometry, re-traced from `pattern.gates`. The document itself is never
+altered — `generate`/`prompt` still emit lattice `curves`, because smooth
+geometry is not serializable — and `render --smooth` requires a document
+that has a pattern (it refuses curves-only L1 documents, whose smooth
+geometry cannot be re-traced).
 
 ---
 
